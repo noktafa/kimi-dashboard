@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comments</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        textarea { width: 100%; height: 100px; padding: 10px; }
+        button { padding: 10px 20px; background: #5cb85c; color: white; border: none; cursor: pointer; }
+        .comment { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        .comment-meta { color: #666; font-size: 0.9em; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h1>💬 Comments</h1>
+    
+    <form method="POST">
+        <textarea name="content" placeholder="Leave a comment..."></textarea>
+        <br><br>
+        <button type="submit">Post Comment</button>
+    </form>
+    
+    <hr>
+    
+    <h2>All Comments</h2>
+    {% for comment in comments %}
+    <div class="comment">
+        <div class="comment-meta">
+            <strong>{{ comment.username or 'Anonymous' }}</strong> - {{ comment.created_at }}
+        </div>
+        <!-- VULNERABLE: Raw HTML output without escaping -->
+        {{ comment.content | safe }}
+    </div>
+    {% else %}
+    <p>No comments yet.</p>
+    {% endfor %}
+    
+    <p><a href="/">← Back to Home</a></p>
+    
+    <hr>
+    <p><em>Hint: Try XSS with: <code><script>alert('XSS')</script></code> or <code><img src=x onerror=alert('XSS')></code></em></p>
+</body>
+</html>

@@ -1,0 +1,50 @@
+# Kimi Ecosystem Docker Setup
+
+# Build artifacts
+**/dist/
+**/build/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.coverage
+**/.tox/
+**/.venv/
+**/venv/
+**/node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment (keep example)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# SSL certificates (user-provided)
+nginx/ssl/*.pem
+nginx/ssl/*.key
+nginx/ssl/*.crt
+!nginx/ssl/.gitkeep
+
+# Data volumes (persisted by Docker)
+/data/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

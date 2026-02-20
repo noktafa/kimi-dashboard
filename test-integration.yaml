@@ -1,0 +1,39 @@
+# Kimi Ecosystem Integration Test
+# Tests the full convergence loop with real components
+
+infrastructure:
+  type: local
+  app_url: http://localhost:8000
+  diagnostics_url: http://localhost:8080
+
+pipeline:
+  max_iterations: 3
+  mode: analyze  # Start with analyze mode for safety
+  convergence_criteria:
+    max_findings: 0
+    max_vulnerabilities: 0
+    tests_must_pass: true
+
+tools:
+  sysadmin_ai:
+    enabled: true
+    policy_mode: local
+    
+  security_auditor:
+    enabled: true
+    target: http://localhost:8000
+    suites:
+      - injection
+      - auth
+      - exposure
+    
+  tests:
+    path: tests/e2e
+
+dashboard:
+  enabled: true
+  websocket_port: 8765
+
+notifications:
+  on_convergence: true
+  on_failure: true

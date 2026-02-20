@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Document</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .document { background: #f5f5f5; padding: 20px; border-radius: 4px; }
+        .private { color: #d9534f; }
+    </style>
+</head>
+<body>
+    <h1>📄 {{ document.title }}</h1>
+    
+    <div class="document">
+        {% if document.is_private %}
+        <p class="private">🔒 Private Document</p>
+        {% endif %}
+        <p><strong>Document ID:</strong> {{ document.id }}</p>
+        <p><strong>Owner ID:</strong> {{ document.user_id }}</p>
+        
+        <hr>
+        <p>{{ document.content }}</p>
+    </div>
+    
+    <p><a href="/documents">← Back to Documents</a> | <a href="/">Home</a></p>
+</body>
+</html>

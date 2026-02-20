@@ -1,0 +1,84 @@
+# Dashboard Service Configuration
+
+service:
+  host: "0.0.0.0"
+  port: 8766
+  log_level: "info"
+  
+  # Backend service URLs (HTTPS)
+  security_auditor_url: "https://localhost:8000"
+  sysadmin_ai_url: "https://localhost:8001"
+  convergence_loop_url: "https://localhost:8002"
+
+# Session Configuration
+session:
+  cookie_name: "kimi_session"
+  max_age: 86400  # 24 hours
+  secure: true
+  http_only: true
+  same_site: "Strict"
+
+auth:
+  # JWT Configuration
+  jwt_secret: ""  # Set via DASHBOARD_JWT_SECRET env var
+  jwt_algorithm: "HS256"
+  jwt_expiry_hours: 24
+  jwt_refresh_hours: 168
+  
+  # Security Settings
+  require_auth: true
+  allowed_hosts:
+    - "*.kimi.local"
+    - "localhost"
+    - "127.0.0.1"
+  cors_origins:
+    - "https://localhost:8766"
+
+# TLS Configuration
+tls:
+  enabled: true
+  cert_path: "${DASHBOARD_TLS_CERT}"
+  key_path: "${DASHBOARD_TLS_KEY}"
+  ca_path: "${DASHBOARD_TLS_CA}"
+  verify_client: false
+
+# User Database (in production, use a real database)
+# Passwords are hashed with PBKDF2
+users:
+  admin:
+    role: "admin"
+    # Default password: admin (change in production!)
+  operator:
+    role: "operator"
+    # Default password: operator
+  viewer:
+    role: "viewer"
+    # Default password: viewer
+
+# Proxy Configuration
+proxy:
+  # Timeout for backend requests (seconds)
+  timeout: 30
+  
+  # Retry attempts for failed requests
+  retry_attempts: 3
+  
+  # Verify SSL certificates for backend services
+  verify_ssl: true
+
+# Logging
+logging:
+  level: "info"
+  format: "json"
+  output: "stdout"
+  
+  # Audit log for security events
+  audit_log:
+    enabled: true
+    path: "/var/log/kimi-dashboard/audit.log"
+    
+    # Log authentication events
+    log_auth: true
+    
+    # Log proxy requests
+    log_proxy: true

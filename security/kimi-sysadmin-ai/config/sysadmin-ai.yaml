@@ -1,0 +1,85 @@
+# SysAdmin AI Service Configuration
+
+service:
+  host: "0.0.0.0"
+  port: 8001
+  log_level: "info"
+  safety_enabled: true
+
+auth:
+  # JWT Configuration
+  jwt_secret: ""  # Set via SYSADMIN_AI_JWT_SECRET env var
+  jwt_algorithm: "HS256"
+  jwt_expiry_hours: 24
+  jwt_refresh_hours: 168
+  
+  # API Key Configuration
+  api_key_header: "X-API-Key"
+  
+  # Security Settings
+  require_auth: true
+  allowed_hosts:
+    - "*.kimi.local"
+    - "localhost"
+    - "127.0.0.1"
+  cors_origins:
+    - "https://dashboard.kimi.local"
+    - "https://localhost:8766"
+
+# TLS Configuration
+tls:
+  enabled: true
+  cert_path: "${SYSADMIN_AI_TLS_CERT}"
+  key_path: "${SYSADMIN_AI_TLS_KEY}"
+  ca_path: "${SYSADMIN_AI_TLS_CA}"
+  verify_client: false
+
+# Safety Configuration
+safety:
+  # Commands that require explicit admin approval
+  destructive_commands:
+    - "rm -rf"
+    - "rm -r /"
+    - "dd if=/dev/zero"
+    - "mkfs"
+    - "format"
+    - "> /dev/sda"
+    - "> /dev/nvme"
+    - "shutdown"
+    - "reboot"
+    - "halt"
+    - "init 0"
+    - "systemctl poweroff"
+    - "poweroff"
+  
+  # High-risk commands that require operator+ role
+  high_risk_commands:
+    - "sudo"
+    - "su -"
+    - "passwd"
+    - "useradd"
+    - "userdel"
+    - "usermod"
+    - "groupadd"
+    - "groupdel"
+    - "chmod 777"
+    - "chown -R"
+  
+  # Allowed hosts for command execution
+  allowed_hosts:
+    - "*.kimi.local"
+    - "localhost"
+    - "127.0.0.1"
+  
+  # Maximum timeout for commands (seconds)
+  max_timeout: 3600
+  
+  # Require approval for all destructive operations
+  require_approval: true
+
+# Logging
+logging:
+  level: "info"
+  format: "json"
+  output: "stdout"
+  audit_log: "/var/log/kimi-sysadmin-ai/audit.log"

@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  # Security Auditor Service
+  security-auditor:
+    build:
+      context: .
+      dockerfile: Dockerfile.security-auditor
+    container_name: kimi-security-auditor
+    ports:
+      - "8000:8000"
+    environment:
+      - SECURITY_AUDITOR_HOST=0.0.0.0
+      - SECURITY_AUDITOR_PORT=8000
+      - SECURITY_AUDITOR_JWT_SECRET=${SECURITY_AUDITOR_JWT_SECRET}
+      - SECURITY_AUDITOR_TLS_CERT=/certs/tls.crt
+      - SECURITY_AUDITOR_TLS_KEY=/certs/tls.key
+      - SECURITY_AUDITOR_TLS_CA=/certs/ca.crt
+      - ENV=production
+    volumes:
+      - ./certs/security-auditor:/certs:ro
+      - ./certs/ca.crt:/certs/ca.crt:ro
+      - ./kimi-security-auditor/config:/app/config:ro
+    networks:
+      - kimi-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-kf", "https://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # SysAdmin AI Service
+  sysadmin-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile.sysadmin-ai
+    container_name: kimi-sysadmin-ai
+    ports:
+      - "8001:8001"
+    environment:
+      - SYSADMIN_AI_HOST=0.0.0.0
+      - SYSADMIN_AI_PORT=8001
+      - SYSADMIN_AI_JWT_SECRET=${SYSADMIN_AI_JWT_SECRET}
+      - SYSADMIN_AI_TLS_CERT=/certs/tls.crt
+      - SYSADMIN_AI_TLS_KEY=/certs/tls.key
+      - SYSADMIN_AI_TLS_CA=/certs/ca.crt
+      - ENV=production
+    volumes:
+      - ./certs/sysadmin-ai:/certs:ro
+      - ./certs/ca.crt:/certs/ca.crt:ro
+      - ./kimi-sysadmin-ai/config:/app/config:ro
+    networks:
+      - kimi-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-kf", "https://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Convergence Loop Service
+  convergence-loop:
+    build:
+      context: .
+      dockerfile: Dockerfile.convergence-loop
+    container_name: kimi-convergence-loop
+    ports:
+      - "8002:8002"
+    environment:
+      - CONVERGENCE_LOOP_HOST=0.0.0.0
+      - CONVERGENCE_LOOP_PORT=8002
+      - CONVERGENCE_LOOP_JWT_SECRET=${CONVERGENCE_LOOP_JWT_SECRET}
+      - CONVERGENCE_LOOP_TLS_CERT=/certs/tls.crt
+      - CONVERGENCE_LOOP_TLS_KEY=/certs/tls.key
+      - CONVERGENCE_LOOP_TLS_CA=/certs/ca.crt
+      - ENV=production
+    volumes:
+      - ./certs/convergence-loop:/certs:ro
+      - ./certs/ca.crt:/certs/ca.crt:ro
+      - ./kimi-convergence-loop/config:/app/config:ro
+    networks:
+      - kimi-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-kf", "https://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Dashboard Service
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: kimi-dashboard
+    ports:
+      - "8766:8766"
+    environment:
+      - DASHBOARD_HOST=0.0.0.0
+      - DASHBOARD_PORT=8766
+      - DASHBOARD_JWT_SECRET=${DASHBOARD_JWT_SECRET}
+      - DASHBOARD_TLS_CERT=/certs/tls.crt
+      - DASHBOARD_TLS_KEY=/certs/tls.key
+      - DASHBOARD_TLS_CA=/certs/ca.crt
+      - DASHBOARD_SECURITY_AUDITOR_URL=https://security-auditor:8000
+      - DASHBOARD_SYSADMIN_AI_URL=https://sysadmin-ai:8001
+      - DASHBOARD_CONVERGENCE_LOOP_URL=https://convergence-loop:8002
+      - ENV=production
+    volumes:
+      - ./certs/dashboard:/certs:ro
+      - ./certs/ca.crt:/certs/ca.crt:ro
+      - ./kimi-dashboard/config:/app/config:ro
+    networks:
+      - kimi-network
+    restart: unless-stopped
+    depends_on:
+      - security-auditor
+      - sysadmin-ai
+      - convergence-loop
+    healthcheck:
+      test: ["CMD", "curl", "-kf", "https://localhost:8766/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  kimi-network:
+    driver: bridge

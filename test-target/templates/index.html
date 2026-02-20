@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vulnerable App - Home</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        h1 { color: #d9534f; }
+        .warning { background: #fcf8e3; border: 1px solid #faebcc; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+        ul { line-height: 2; }
+        a { color: #337ab7; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>🚨 Vulnerable Web Application</h1>
+    
+    <div class="warning">
+        <strong>Warning:</strong> This application contains intentional security vulnerabilities 
+        for authorized security testing and educational purposes only.
+    </div>
+    
+    <h2>Available Vulnerabilities:</h2>
+    <ul>
+        <li><a href="/login">1. SQL Injection - Login Form</a></li>
+        <li><a href="/ping">2. Command Injection - Ping Utility</a></li>
+        <li><a href="/comments">3. XSS - Comment/Feedback Form</a></li>
+        <li><a href="/profile">4. Insecure Deserialization - Profile Data</a></li>
+        <li><a href="/documents">5. IDOR - Document Access</a></li>
+        <li><a href="/login">6. Weak Authentication - Login/Backdoor</a></li>
+        <li><a href="/upload">7. File Upload - No Validation</a></li>
+        <li><a href="/xml">8. XXE - XML Parser</a></li>
+        <li><a href="/debug">9. Information Disclosure - Debug Info</a></li>
+        <li><a href="/search?q=test">10. CORS Misconfig - Check Headers</a></li>
+    </ul>
+    
+    <h2>Additional Endpoints:</h2>
+    <ul>
+        <li><a href="/users">User List (Info Disclosure)</a></li>
+        <li><a href="/.git/config">Exposed .git/config</a></li>
+    </ul>
+    
+    <p><a href="/logout">Logout</a></p>
+</body>
+</html>

@@ -1,0 +1,51 @@
+# Security Auditor Service Configuration
+
+service:
+  host: "0.0.0.0"
+  port: 8000
+  log_level: "info"
+
+auth:
+  # JWT Configuration
+  jwt_secret: ""  # Set via SECURITY_AUDITOR_JWT_SECRET env var
+  jwt_algorithm: "HS256"
+  jwt_expiry_hours: 24
+  jwt_refresh_hours: 168
+  
+  # API Key Configuration
+  api_key_header: "X-API-Key"
+  
+  # Security Settings
+  require_auth: true
+  allowed_hosts:
+    - "*.kimi.local"
+    - "localhost"
+    - "127.0.0.1"
+  cors_origins:
+    - "https://dashboard.kimi.local"
+    - "https://localhost:8766"
+
+# TLS Configuration
+tls:
+  enabled: true
+  cert_path: "${KIMI_SECURITY_AUDITOR_TLS_CERT}"
+  key_path: "${KIMI_SECURITY_AUDITOR_TLS_KEY}"
+  ca_path: "${KIMI_SECURITY_AUDITOR_TLS_CA}"
+  verify_client: false
+
+# Scanning Configuration
+scanning:
+  max_concurrent_scans: 5
+  default_timeout: 300
+  allowed_targets:
+    - "*.kimi.local"
+    - "localhost"
+  
+  # Rate limiting
+  rate_limit_per_minute: 10
+
+# Logging
+logging:
+  level: "info"
+  format: "json"
+  output: "stdout"

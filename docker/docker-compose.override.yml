@@ -1,0 +1,35 @@
+# Docker override for development
+# This file is automatically loaded by docker-compose
+
+version: "3.9"
+
+services:
+  kimi-security-auditor:
+    volumes:
+      - ./services/security-auditor/src:/app/src:ro
+    environment:
+      - LOG_LEVEL=DEBUG
+      - RELOAD=true
+    command: ["python", "-m", "src.main", "--reload"]
+
+  kimi-sysadmin-ai:
+    volumes:
+      - ./services/sysadmin-ai/src:/app/src:ro
+    environment:
+      - LOG_LEVEL=DEBUG
+      - RELOAD=true
+    command: ["python", "-m", "src.main", "--reload"]
+
+  kimi-convergence-loop:
+    volumes:
+      - ./services/convergence-loop/src:/app/src:ro
+    environment:
+      - LOG_LEVEL=DEBUG
+      - RELOAD=true
+    command: ["python", "-m", "src.main", "--reload"]
+
+  kimi-dashboard:
+    volumes:
+      - ./services/dashboard/src:/app/src:ro
+    environment:
+      - NODE_ENV=development

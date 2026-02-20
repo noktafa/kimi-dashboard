@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+        .error { color: #d9534f; background: #f2dede; padding: 10px; border-radius: 4px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #337ab7; color: white; border: none; cursor: pointer; }
+        button:hover { background: #286090; }
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+    
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    
+    <form method="POST">
+        <label>Username:</label>
+        <input type="text" name="username" placeholder="Enter username">
+        
+        <label>Password:</label>
+        <input type="password" name="password" placeholder="Enter password">
+        
+        <button type="submit">Login</button>
+    </form>
+    
+    <p><a href="/">← Back to Home</a></p>
+    
+    <hr>
+    <p><em>Hint: Try SQL Injection with: <code>' OR '1'='1</code></em></p>
+</body>
+</html>

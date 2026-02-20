@@ -1,0 +1,21 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy shared module
+COPY shared/ ./shared/
+
+# Copy service code
+COPY kimi-convergence-loop/src/ ./
+COPY kimi-convergence-loop/config/ ./config/
+
+# Set Python path
+ENV PYTHONPATH=/app:/app/shared
+
+EXPOSE 8002
+
+CMD ["python", "main.py"]

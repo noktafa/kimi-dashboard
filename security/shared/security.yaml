@@ -1,0 +1,60 @@
+# Shared Security Configuration
+# This file contains common security settings for all Kimi ecosystem services
+
+# Authentication Settings
+auth:
+  # JWT Configuration
+  jwt_secret: "${KIMI_JWT_SECRET}"  # Generate with: openssl rand -base64 32
+  jwt_algorithm: "HS256"
+  jwt_expiry_hours: 24
+  jwt_refresh_hours: 168  # 7 days
+  
+  # API Key Configuration
+  api_key_header: "X-API-Key"
+  
+  # Security Settings
+  require_auth: true
+  allowed_hosts:
+    - "*.kimi.local"
+    - "localhost"
+    - "127.0.0.1"
+  cors_origins:
+    - "https://dashboard.kimi.local"
+    - "https://localhost:8766"
+
+# TLS Configuration
+tls:
+  enabled: true
+  cert_path: "${KIMI_TLS_CERT}"
+  key_path: "${KIMI_TLS_KEY}"
+  ca_path: "${KIMI_TLS_CA}"
+  verify_client: false  # Set to true for mTLS
+  
+# Role Definitions
+roles:
+  admin:
+    description: "Full system access"
+    permissions:
+      - "*"
+  
+  operator:
+    description: "Can execute commands and manage workflows"
+    permissions:
+      - "read:*"
+      - "create:*"
+      - "execute:command"
+  
+  viewer:
+    description: "Read-only access"
+    permissions:
+      - "read:*"
+
+# API Keys (hashed)
+# Use the generate_api_key.py script to create new keys
+api_keys: {}
+
+# Rate Limiting
+rate_limiting:
+  enabled: true
+  requests_per_minute: 100
+  burst_size: 20

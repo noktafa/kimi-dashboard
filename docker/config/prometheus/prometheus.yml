@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files: []
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'kimi-security-auditor'
+    static_configs:
+      - targets: ['kimi-security-auditor:8000']
+    metrics_path: /metrics
+
+  - job_name: 'kimi-sysadmin-ai'
+    static_configs:
+      - targets: ['kimi-sysadmin-ai:8001']
+    metrics_path: /metrics
+
+  - job_name: 'kimi-convergence-loop'
+    static_configs:
+      - targets: ['kimi-convergence-loop:8002']
+    metrics_path: /metrics
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['kimi-postgres:5432']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['kimi-redis:6379']

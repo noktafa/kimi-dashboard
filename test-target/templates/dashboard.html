@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .welcome { background: #d9edf7; padding: 15px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    
+    <div class="welcome">
+        <p>Welcome, <strong>{{ user.username }}</strong>!</p>
+        {% if user.is_admin %}
+        <p>🏆 You have admin privileges.</p>
+        {% endif %}
+    </div>
+    
+    <h2>Navigation</h2>
+    <ul>
+        <li><a href="/documents">My Documents</a></li>
+        <li><a href="/comments">Comments</a></li>
+        <li><a href="/profile">Profile Settings</a></li>
+        <li><a href="/upload">Upload File</a></li>
+        <li><a href="/ping">Network Tools</a></li>
+    </ul>
+    
+    <p><a href="/logout">Logout</a> | <a href="/">Home</a></p>
+</body>
+</html>

@@ -1,0 +1,82 @@
+# Convergence Loop Service Configuration
+
+service:
+  host: "0.0.0.0"
+  port: 8002
+  log_level: "info"
+  websocket_ping_interval: 20
+  websocket_ping_timeout: 20
+
+auth:
+  # JWT Configuration
+  jwt_secret: ""  # Set via CONVERGENCE_LOOP_JWT_SECRET env var
+  jwt_algorithm: "HS256"
+  jwt_expiry_hours: 24
+  jwt_refresh_hours: 168
+  
+  # API Key Configuration
+  api_key_header: "X-API-Key"
+  
+  # Security Settings
+  require_auth: true
+  allowed_hosts:
+    - "*.kimi.local"
+    - "localhost"
+    - "127.0.0.1"
+  cors_origins:
+    - "https://dashboard.kimi.local"
+    - "https://localhost:8766"
+
+# TLS Configuration
+tls:
+  enabled: true
+  cert_path: "${CONVERGENCE_LOOP_TLS_CERT}"
+  key_path: "${CONVERGENCE_LOOP_TLS_KEY}"
+  ca_path: "${CONVERGENCE_LOOP_TLS_CA}"
+  verify_client: false
+
+# WebSocket Configuration
+websocket:
+  # Maximum message size (bytes)
+  max_message_size: 1048576  # 1MB
+  
+  # Maximum number of connections per user
+  max_connections_per_user: 5
+  
+  # Heartbeat interval (seconds)
+  heartbeat_interval: 30
+  
+  # Connection timeout (seconds)
+  connection_timeout: 300
+
+# Workflow Configuration
+workflows:
+  # Maximum concurrent workflows
+  max_concurrent: 10
+  
+  # Default workflow timeout (seconds)
+  default_timeout: 3600
+  
+  # Allowed workflow types
+  allowed_types:
+    - "security_scan"
+    - "deployment"
+    - "backup"
+    - "maintenance"
+
+# Event Broadcasting
+events:
+  # Enable event broadcasting to dashboard
+  broadcast_enabled: true
+  
+  # Rate limit for events (per second)
+  rate_limit: 100
+  
+  # Event retention (seconds)
+  retention_seconds: 86400  # 24 hours
+
+# Logging
+logging:
+  level: "info"
+  format: "json"
+  output: "stdout"

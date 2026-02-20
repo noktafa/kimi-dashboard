@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ping Utility</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        input { width: 70%; padding: 10px; }
+        button { padding: 10px 20px; background: #5cb85c; color: white; border: none; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🌐 Ping Utility</h1>
+    
+    <form method="POST">
+        <input type="text" name="host" placeholder="Enter hostname or IP (e.g., google.com)" required>
+        <button type="submit">Ping</button>
+    </form>
+    
+    {% if output %}
+    <h3>Output:</h3>
+    <pre>{{ output }}</pre>
+    {% endif %}
+    
+    <p><a href="/">← Back to Home</a></p>
+    
+    <hr>
+    <p><em>Hint: Try command injection with: <code>google.com; cat /etc/passwd</code> or <code>google.com && whoami</code></em></p>
+</body>
+</html>

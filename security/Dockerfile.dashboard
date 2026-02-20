@@ -1,0 +1,24 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy shared module
+COPY shared/ ./shared/
+
+# Copy service code
+COPY kimi-dashboard/src/ ./
+COPY kimi-dashboard/config/ ./config/
+
+# Create templates directory
+RUN mkdir -p templates static
+
+# Set Python path
+ENV PYTHONPATH=/app:/app/shared
+
+EXPOSE 8766
+
+CMD ["python", "main.py"]

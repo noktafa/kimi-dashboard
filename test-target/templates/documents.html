@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Documents</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f5f5f5; }
+        .private { color: #d9534f; }
+        .public { color: #5cb85c; }
+    </style>
+</head>
+<body>
+    <h1>📄 My Documents</h1>
+    
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Visibility</th>
+            <th>Action</th>
+        </tr>
+        {% for doc in documents %}
+        <tr>
+            <td>{{ doc.id }}</td>
+            <td>{{ doc.title }}</td>
+            <td class="{{ 'private' if doc.is_private else 'public' }}">
+                {{ 'Private' if doc.is_private else 'Public' }}
+            </td>
+            <td><a href="/document/{{ doc.id }}">View</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <p><a href="/">← Back to Home</a></p>
+    
+    <hr>
+    <p><em>Hint: Try accessing other users' documents by changing the ID: <code>/document/1</code></em></p>
+</body>
+</html>

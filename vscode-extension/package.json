@@ -1,0 +1,266 @@
+{
+  "name": "kimi-ecosystem",
+  "displayName": "Kimi Ecosystem",
+  "description": "VS Code extension for the Kimi ecosystem - audit, admin, and converge tools",
+  "version": "0.1.0",
+  "publisher": "kimi-ecosystem",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Testing",
+    "Security"
+  ],
+  "keywords": [
+    "kimi",
+    "audit",
+    "security",
+    "converge",
+    "admin"
+  ],
+  "activationEvents": [
+    "onCommand:kimi-ecosystem.audit",
+    "onCommand:kimi-ecosystem.admin",
+    "onCommand:kimi-ecosystem.converge",
+    "onView:kimi-ecosystem.convergenceView"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "kimi-ecosystem.audit",
+        "title": "Kimi: Run Audit",
+        "category": "Kimi",
+        "icon": "$(search)"
+      },
+      {
+        "command": "kimi-ecosystem.auditFile",
+        "title": "Kimi: Audit Current File",
+        "category": "Kimi",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "kimi-ecosystem.admin",
+        "title": "Kimi: Open Admin",
+        "category": "Kimi",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "kimi-ecosystem.converge",
+        "title": "Kimi: Run Converge",
+        "category": "Kimi",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "kimi-ecosystem.refreshConvergence",
+        "title": "Refresh",
+        "category": "Kimi",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "kimi-ecosystem.openConfig",
+        "title": "Kimi: Open Configuration",
+        "category": "Kimi",
+        "icon": "$(settings)"
+      },
+      {
+        "command": "kimi-ecosystem.showLogs",
+        "title": "Kimi: Show Logs",
+        "category": "Kimi",
+        "icon": "$(output)"
+      },
+      {
+        "command": "kimi-ecosystem.stopConvergence",
+        "title": "Stop Convergence",
+        "category": "Kimi",
+        "icon": "$(debug-stop)"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "kimi-ecosystem.convergenceView",
+          "name": "Kimi Convergence",
+          "when": "kimi-ecosystem.enabled",
+          "icon": "$(sync)"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "kimi-ecosystem",
+          "title": "Kimi Ecosystem",
+          "icon": "$(sync)"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "kimi-ecosystem.convergenceView",
+        "contents": "No convergence data available. Run 'Kimi: Run Converge' to start."
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "kimi-ecosystem.audit",
+          "when": "kimi-ecosystem.enabled"
+        },
+        {
+          "command": "kimi-ecosystem.admin",
+          "when": "kimi-ecosystem.enabled"
+        },
+        {
+          "command": "kimi-ecosystem.converge",
+          "when": "kimi-ecosystem.enabled"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "kimi-ecosystem.auditFile",
+          "when": "editorTextFocus && kimi-ecosystem.enabled",
+          "group": "9_kimi@1"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "kimi-ecosystem.refreshConvergence",
+          "when": "view == kimi-ecosystem.convergenceView",
+          "group": "navigation"
+        },
+        {
+          "command": "kimi-ecosystem.stopConvergence",
+          "when": "view == kimi-ecosystem.convergenceView && kimi-ecosystem.convergenceRunning",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "kimi-ecosystem.auditFile",
+        "key": "ctrl+shift+k a",
+        "mac": "cmd+shift+k a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "kimi-ecosystem.converge",
+        "key": "ctrl+shift+k c",
+        "mac": "cmd+shift+k c"
+      }
+    ],
+    "configuration": {
+      "title": "Kimi Ecosystem",
+      "properties": {
+        "kimi-ecosystem.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable the Kimi Ecosystem extension"
+        },
+        "kimi-ecosystem.kimiPath": {
+          "type": "string",
+          "default": "kimi",
+          "description": "Path to the kimi CLI executable"
+        },
+        "kimi-ecosystem.audit.autoRunOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically run audit on file save"
+        },
+        "kimi-ecosystem.convergence.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh convergence status"
+        },
+        "kimi-ecosystem.convergence.refreshInterval": {
+          "type": "number",
+          "default": 5000,
+          "description": "Convergence refresh interval in milliseconds"
+        },
+        "kimi-ecosystem.logs.maxLines": {
+          "type": "number",
+          "default": 1000,
+          "description": "Maximum number of log lines to keep in output channel"
+        },
+        "kimi-ecosystem.security.severityThreshold": {
+          "type": "string",
+          "enum": ["info", "low", "medium", "high", "critical"],
+          "default": "low",
+          "description": "Minimum severity level for security findings"
+        }
+      }
+    },
+    "problemMatchers": [
+      {
+        "name": "kimi-audit",
+        "owner": "kimi-ecosystem",
+        "fileLocation": ["absolute"],
+        "pattern": [
+          {
+            "regexp": "^\\[KIMI_AUDIT\\]\\s+(ERROR|WARN|INFO)\\s+(.+)$",
+            "severity": 1,
+            "message": 2
+          },
+          {
+            "regexp": "^\\s+File:\\s+(.+):?(\\d+)?$",
+            "file": 1,
+            "line": 2
+          }
+        ]
+      },
+      {
+        "name": "kimi-security",
+        "owner": "kimi-ecosystem",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": [
+          {
+            "regexp": "^\\[SECURITY\\]\\s+(CRITICAL|HIGH|MEDIUM|LOW|INFO)\\s+(.+)$",
+            "severity": 1,
+            "message": 2
+          },
+          {
+            "regexp": "^\\s+at\\s+(.+):?(\\d+)?$",
+            "file": 1,
+            "line": 2
+          }
+        ]
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "kimi",
+        "required": ["command"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": ["audit", "admin", "converge"],
+            "description": "Kimi command to run"
+          },
+          "args": {
+            "type": "array",
+            "description": "Additional arguments"
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "yaml": "^2.3.4"
+  }
+}

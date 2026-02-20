@@ -1,0 +1,348 @@
+# Kimi Ecosystem - Docker Compose
+# Production-ready orchestration for the entire Kimi ecosystem
+
+version: "3.9"
+
+services:
+  # ============================================
+  # Infrastructure Services
+  # ============================================
+  
+  postgres:
+    image: postgres:16-alpine
+    container_name: kimi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kimi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kimi_secure_password}
+      POSTGRES_DB: ${POSTGRES_DB:-kimi_ecosystem}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/postgres/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - kimi-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kimi} -d ${POSTGRES_DB:-kimi_ecosystem}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: kimi-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-kimi_redis_pass}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - kimi-backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # Core Application Services
+  # ============================================
+
+  kimi-security-auditor:
+    build:
+      context: ./services/security-auditor
+      dockerfile: Dockerfile
+    container_name: kimi-security-auditor
+    restart: unless-stopped
+    environment:
+      - SERVICE_NAME=security-auditor
+      - PORT=8000
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-kimi}:${POSTGRES_PASSWORD:-kimi_secure_password}@postgres:5432/${POSTGRES_DB:-kimi_ecosystem}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-kimi_redis_pass}@redis:6379/0
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SCAN_INTERVAL=${SCAN_INTERVAL:-3600}
+      - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-5}
+    ports:
+      - "8000:8000"
+    networks:
+      - kimi-backend
+      - kimi-internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - security_reports:/app/reports
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  kimi-sysadmin-ai:
+    build:
+      context: ./services/sysadmin-ai
+      dockerfile: Dockerfile
+    container_name: kimi-sysadmin-ai
+    restart: unless-stopped
+    environment:
+      - SERVICE_NAME=sysadmin-ai
+      - PORT=8001
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-kimi}:${POSTGRES_PASSWORD:-kimi_secure_password}@postgres:5432/${POSTGRES_DB:-kimi_ecosystem}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-kimi_redis_pass}@redis:6379/1
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SSH_KEY_PATH=${SSH_KEY_PATH:-/app/keys}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+    ports:
+      - "8001:8001"
+    networks:
+      - kimi-backend
+      - kimi-internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - sysadmin_keys:/app/keys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  kimi-convergence-loop:
+    build:
+      context: ./services/convergence-loop
+      dockerfile: Dockerfile
+    container_name: kimi-convergence-loop
+    restart: unless-stopped
+    environment:
+      - SERVICE_NAME=convergence-loop
+      - PORT=8002
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-kimi}:${POSTGRES_PASSWORD:-kimi_secure_password}@postgres:5432/${POSTGRES_DB:-kimi_ecosystem}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-kimi_redis_pass}@redis:6379/2
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SECURITY_AUDITOR_URL=http://kimi-security-auditor:8000
+      - SYSADMIN_AI_URL=http://kimi-sysadmin-ai:8001
+      - DASHBOARD_URL=http://kimi-dashboard:80
+      - CONVERGENCE_INTERVAL=${CONVERGENCE_INTERVAL:-60}
+    ports:
+      - "8002:8002"
+    networks:
+      - kimi-backend
+      - kimi-internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kimi-security-auditor:
+        condition: service_started
+      kimi-sysadmin-ai:
+        condition: service_started
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  kimi-dashboard:
+    build:
+      context: ./services/dashboard
+      dockerfile: Dockerfile
+    container_name: kimi-dashboard
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=http://kimi-convergence-loop:8002
+      - WS_URL=ws://kimi-convergence-loop:8002/ws
+    ports:
+      - "3000:80"
+    networks:
+      - kimi-backend
+      - kimi-internal
+    depends_on:
+      kimi-convergence-loop:
+        condition: service_started
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+  # ============================================
+  # Reverse Proxy
+  # ============================================
+
+  nginx:
+    image: nginx:alpine
+    container_name: kimi-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - kimi-backend
+      - kimi-internal
+    depends_on:
+      - kimi-security-auditor
+      - kimi-sysadmin-ai
+      - kimi-convergence-loop
+      - kimi-dashboard
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # ============================================
+  # Monitoring (Optional)
+  # ============================================
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kimi-prometheus
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - kimi-backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: kimi-grafana
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3001:3000"
+    networks:
+      - kimi-backend
+    depends_on:
+      - prometheus
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ============================================
+# Networks
+# ============================================
+
+networks:
+  kimi-backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  kimi-internal:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+# ============================================
+# Volumes
+# ============================================
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  security_reports:
+    driver: local
+  sysadmin_keys:
+    driver: local
+  nginx_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

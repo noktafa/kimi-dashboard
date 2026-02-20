@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile Settings</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        textarea { width: 100%; height: 150px; font-family: monospace; }
+        button { padding: 10px 20px; background: #5cb85c; color: white; border: none; cursor: pointer; margin-right: 10px; }
+        .message { padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .success { background: #dff0d8; }
+        .error { background: #f2dede; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>👤 Profile Settings</h1>
+    
+    {% if message %}
+    <div class="message {{ 'success' if 'Error' not in message else 'error' }}">
+        {{ message }}
+    </div>
+    {% endif %}
+    
+    <form method="POST">
+        <label>Data Format:</label>
+        <select name="format">
+            <option value="json">JSON</option>
+            <option value="pickle">Pickle</option>
+        </select>
+        <br><br>
+        
+        <label>Profile Data:</label>
+        <textarea name="data" placeholder='{"name": "John", "age": 30}'></textarea>
+        <br><br>
+        
+        <button type="submit">Load Profile Data</button>
+    </form>
+    
+    {% if user_data %}
+    <h3>Loaded Data:</h3>
+    <pre>{{ user_data }}</pre>
+    {% endif %}
+    
+    <p><a href="/">← Back to Home</a></p>
+    
+    <hr>
+    <p><em>Hint: Try insecure deserialization with Python pickle payload</em></p>
+    <pre># Generate pickle payload:
+import pickle
+import base64
+payload = pickle.dumps({"__reduce__": ("os.system", ("whoami",))})
+# Or use: pickle.dumps({"test": "data"})</pre>
+</body>
+</html>

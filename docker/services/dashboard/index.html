@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kimi Ecosystem Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        .header {
+            background: #1e293b;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #38bdf8; }
+        .nav { display: flex; gap: 1.5rem; }
+        .nav a { color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+        .nav a:hover { color: #38bdf8; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #334155;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .card h3 { color: #38bdf8; margin-bottom: 1rem; font-size: 1.1rem; }
+        .status { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #22c55e; animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .metric { font-size: 2rem; font-weight: bold; color: #f8fafc; }
+        .metric-label { color: #64748b; font-size: 0.875rem; }
+        .btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #7dd3fc; }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            border-top: 1px solid #334155;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">🤖 Kimi Ecosystem</div>
+        <nav class="nav">
+            <a href="#">Dashboard</a>
+            <a href="#">Security</a>
+            <a href="#">SysAdmin</a>
+            <a href="#">Workflows</a>
+            <a href="#">Settings</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1>System Overview</h1>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>🔒 Security Auditor</h3>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span>Operational</span>
+                </div>
+                <div class="metric">0</div>
+                <div class="metric-label">Active Scans</div>
+            </div>
+            
+            <div class="card">
+                <h3>⚙️ SysAdmin AI</h3>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span>Operational</span>
+                </div>
+                <div class="metric">0</div>
+                <div class="metric-label">Managed Hosts</div>
+            </div>
+            
+            <div class="card">
+                <h3>🔄 Convergence Loop</h3>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span>Operational</span>
+                </div>
+                <div class="metric">0</div>
+                <div class="metric-label">Active Workflows</div>
+            </div>
+            
+            <div class="card">
+                <h3>📊 System Health</h3>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span>All Systems Green</span>
+                </div>
+                <div class="metric">100%</div>
+                <div class="metric-label">Uptime</div>
+            </div>
+        </div>
+        
+        <div class="grid" style="margin-top: 2rem;">
+            <div class="card" style="grid-column: 1 / -1;">
+                <h3>Recent Activity</h3>
+                <p style="color: #64748b; margin-top: 1rem;">No recent activity to display.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>Kimi Ecosystem v1.0.0 | Built with ❤️</p>
+    </footer>
+    
+    <script>
+        // Simple health check polling
+        async function checkHealth() {
+            try {
+                const response = await fetch('/api/health');
+                if (response.ok) {
+                    console.log('System healthy');
+                }
+            } catch (e) {
+                console.log('Health check failed:', e);
+            }
+        }
+        
+        setInterval(checkHealth, 30000);
+        checkHealth();
+    </script>
+</body>
+</html>

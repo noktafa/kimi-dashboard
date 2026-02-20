@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        input[type="file"] { margin: 20px 0; }
+        button { padding: 10px 20px; background: #5cb85c; color: white; border: none; cursor: pointer; }
+        .success { background: #dff0d8; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>📁 File Upload</h1>
+    
+    {% if message %}
+    <div class="success">{{ message }}</div>
+    {% if filename %}
+    <p><a href="/uploads/{{ filename }}" target="_blank">View uploaded file</a></p>
+    {% endif %}
+    {% endif %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <br>
+        <button type="submit">Upload</button>
+    </form>
+    
+    <p><a href="/">← Back to Home</a></p>
+    
+    <hr>
+    <p><em>Hint: Try uploading files with dangerous extensions like .html, .js, or .py</em></p>
+</body>
+</html>
